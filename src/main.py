@@ -25,10 +25,6 @@ from typing import Optional, Any, Callable
 import requests
 from html2text import html2text
 
-if not openai.api_key:
-    print("Set the environment variable OPENAI_KEY or OPENAI_API_KEY to your api secret key")
-    exit(1)
-
 @dataclass
 class Setting:
     name: str
