@@ -1,7 +1,9 @@
 import simplejson
 import enum
 import inspect
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 import sys
 import threading
 import time
@@ -88,7 +90,7 @@ def create_chat(messages, temperature, functions, model, spinner=False, stream=T
         }
         if functions:
             args['functions'] = list(map(lambda f: _json_schema(f), functions))
-        return openai.ChatCompletion.create(**args)
+        return client.chat.completions.create(**args)
 
     if not spinner:
         chats = []
@@ -99,15 +101,13 @@ def create_chat(messages, temperature, functions, model, spinner=False, stream=T
 
 def suggest_name(chat_id, message):
     try:
-        chat_completion_resp = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You assign names to conversations based on the first message. Respond with only a short, descriptive title for a conversation."},
-                {"role": "user", "content": message}
-            ],
-            temperature=0,
-            max_tokens=10
-        )
+        chat_completion_resp = client.chat.completions.create(model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You assign names to conversations based on the first message. Respond with only a short, descriptive title for a conversation."},
+            {"role": "user", "content": message}
+        ],
+        temperature=0,
+        max_tokens=10)
         name = chat_completion_resp.choices[0].message.content
         return (chat_id, name)
     except Exception as e:
